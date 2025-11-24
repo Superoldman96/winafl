@@ -581,6 +581,13 @@ static void destroy_target_process(int wait_exit) {
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
 
+#ifdef TINYINST
+  if (use_tinyinst) {
+    tinyinst_killtarget();
+    return;
+  }
+#endif
+
   EnterCriticalSection(&critical_section);
 
   if(!child_handle) {

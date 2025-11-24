@@ -185,7 +185,7 @@ def setup_argparse():
               winafl-cmin.py -Y -t 100000 -i in -o minset -- test.instr.exe @@
             
              * Typical use with TinyInst mode instrumentation
-             winafl-cmin.py -y -t 100000 -i in -o minset  -instrument_module m.dll -target_module test.exe -target_method fuzz -nargs 2 -- test.exe @@
+             winafl-cmin.py -y -t 100000 -i in -o minset -instrument_module m.dll -target_module test.exe -target_method fuzz -nargs 2 -- test.exe @@
             '''
         ), 100, replace_whitespace = False))
     )
@@ -239,6 +239,21 @@ def setup_argparse():
         help = 'use the TinyInst instrumentation mode'
     )
 
+
+    instr_module = group.add_mutually_exclusive_group(required = True)
+    instr_module.add_argument(
+        '-coverage_module', dest = 'coverage_modules', default = None,
+        action = 'append', metavar = 'module', help = 'module for which to record coverage.'
+        ' Multiple module flags are supported'
+    )
+
+    instr_module.add_argument(
+        '-instrument_module', dest = 'instrument_modules', default = None,
+        action = 'append', metavar = 'module', help = 'module for which to record coverage.'
+        ' Multiple module flags are supported'
+    )
+
+
     group.add_argument(
         '-covtype', choices = ('edge', 'bb'), default = 'bb',
         help = 'the type of coverage being recorded (defaults to bb)'
@@ -247,18 +262,7 @@ def setup_argparse():
         '-call_convention', choices = ('stdcall', 'fastcall', 'thiscall', 'ms64'),
         default = 'stdcall', help = 'the calling convention of the target_method'
     )
-    group.add_argument(
-        '-coverage_module', dest = 'coverage_modules', default = None,
-        action = 'append', metavar = 'module', help = 'module for which to record coverage.'
-        ' Multiple module flags are supported'
-    )
-
-    group.add_argument(
-        '-instrument_module', dest = 'instrument_modules', default = None,
-        action = 'append', metavar = 'module', help = 'module for which to record coverage.'
-        ' Multiple module flags are supported'
-    )
-
+    
     group.add_argument(
         '-target_module', default = None, metavar = 'module',
         help = 'module which contains the target function to be fuzzed'
@@ -280,6 +284,7 @@ def setup_argparse():
         '-target_offset', default = None, type = target_offset, metavar = 'rva offset',
         help = 'offset of the method to fuzz from the start of the module'
     )
+
 
     group = parser.add_argument_group('execution control settings')
     group.add_argument(
